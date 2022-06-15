@@ -1,0 +1,93 @@
+﻿<Window x:Class="PdfImageExtracter.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:v="clr-namespace:PdfImageExtracter.Views"
+        xmlns:vm="clr-namespace:PdfImageExtracter.ViewModels"
+        Title="MainWindow"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Width="525"
+        Height="350">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+
+    <behaviors:Interaction.Triggers>
+        <!--  When ContentRendered event raised, Initialize method of ViewModel would be called.  -->
+        <behaviors:EventTrigger EventName="ContentRendered">
+            <l:LivetCallMethodAction MethodName="Initialize"
+                                     MethodTarget="{Binding}" />
+        </behaviors:EventTrigger>
+
+        <!--  Dispose method is called, when Window closing.  -->
+        <behaviors:EventTrigger EventName="Closed">
+            <l:DataContextDisposeAction />
+        </behaviors:EventTrigger>
+
+        <!--  If you make user choose 'OK or Cancel' closing Window, then please use Window Close cancel Behavior.  -->
+
+    </behaviors:Interaction.Triggers>
+
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <ProgressBar />
+            <Label Content="" />
+        </StatusBar>
+
+        <Grid Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="保存先"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Margin="3"
+                   VerticalAlignment="Center" />
+            <TextBox Grid.Row="0"
+                     Grid.Column="1"
+                     Margin="3"
+                     Text="{Binding OutputFolder.Value}" />
+            <Button Content="..."
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Margin="3" />
+
+            <CheckBox Content="ファイル名でフォルダを作成する"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      Margin="3" />
+
+            <StackPanel Grid.Row="2"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                <CheckBox Content="リサイズする"
+                          Margin="3" />
+                <ComboBox Margin="3" />
+                <ui:NumberBox Margin="3"
+                              SpinButtonPlacementMode="Inline"
+                              TextAlignment="Right" />
+            </StackPanel>
+
+            <Button Content="抽出"
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="3"
+                    Command="{Binding ExtractImageCommand}" />
+
+        </Grid>
+    </DockPanel>
+</Window>
