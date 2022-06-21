@@ -27,22 +27,38 @@
             <l:DataContextDisposeAction />
         </behaviors:EventTrigger>
 
-        <!--  If you make user choose 'OK or Cancel' closing Window, then please use Window Close cancel Behavior.  -->
+        <l:InteractionMessageTrigger MessageKey="WindowAction"
+                                     Messenger="{Binding Messenger}">
+            <l:WindowInteractionMessageAction />
+        </l:InteractionMessageTrigger>
+
+        <l:InteractionMessageTrigger MessageKey="FolderSelect"
+                                     Messenger="{Binding Messenger}">
+            <l:FolderBrowserDialogInteractionMessageAction />
+        </l:InteractionMessageTrigger>
 
     </behaviors:Interaction.Triggers>
 
+    <behaviors:Interaction.Behaviors>
+        <l:WindowCloseCancelBehavior CanClose="{Binding CanClose.Value}"
+                                     CloseCanceledCallbackCommand="{Binding CloseCanceledCallbackCommand}" />
+    </behaviors:Interaction.Behaviors>
+
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
-            <ProgressBar />
-            <Label Content="" />
+            <ProgressBar Width="100"
+                         Maximum="{Binding ProgressMax.Value, Mode=OneWay}"
+                         Visibility="{Binding ProgressBarVisibility.Value, Mode=OneWay}"
+                         Value="{Binding Progress.Value, Mode=OneWay}" />
+            <TextBlock Text="{Binding StatusMessage.Value}" />
         </StatusBar>
 
         <Grid Margin="3">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
                 <RowDefinition />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -51,34 +67,57 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
+            <Border Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Margin="3"
+                    AllowDrop="True"
+                    BorderBrush="{ui:ThemeResource ResourceKey=SystemControlForegroundBaseMediumBrush}"
+                    BorderThickness="1"
+                    CornerRadius="2" />
+
             <Label Content="保存先"
-                   Grid.Row="0"
+                   Grid.Row="1"
                    Grid.Column="0"
                    Margin="3"
                    VerticalAlignment="Center" />
-            <TextBox Grid.Row="0"
+            <TextBox Grid.Row="1"
                      Grid.Column="1"
                      Margin="3"
                      Text="{Binding OutputFolder.Value}" />
             <Button Content="..."
-                    Grid.Row="0"
+                    Grid.Row="1"
                     Grid.Column="2"
-                    Margin="3" />
+                    Margin="3"
+                    Command="{Binding FolderSelectCommand}" />
 
             <CheckBox Content="ファイル名でフォルダを作成する"
-                      Grid.Row="1"
+                      Grid.Row="2"
                       Grid.Column="1"
-                      Margin="3" />
+                      Margin="3"
+                      IsChecked="{Binding MakeSubFolder.Value}" />
 
-            <StackPanel Grid.Row="2"
+            <StackPanel Grid.Row="3"
                         Grid.Column="1"
+                        Grid.ColumnSpan="2"
                         Orientation="Horizontal">
                 <CheckBox Content="リサイズする"
-                          Margin="3" />
-                <ComboBox Margin="3" />
-                <ui:NumberBox Margin="3"
+                          Margin="3"
+                          IsChecked="{Binding ResizeImage.Value}" />
+                <ComboBox Margin="3"
+                          IsEnabled="{Binding ResizeImage.Value}"
+                          SelectedIndex="{Binding ResizeMode.Value}">
+                    <ComboBoxItem Content="縦" />
+                    <ComboBoxItem Content="横" />
+                </ComboBox>
+                <ui:NumberBox Width="150"
+                              Margin="3"
+                              IsEnabled="{Binding ResizeImage.Value}"
+                              Maximum="2147483647"
+                              Minimum="0"
                               SpinButtonPlacementMode="Inline"
-                              TextAlignment="Right" />
+                              TextAlignment="Right"
+                              Value="{Binding ResizePixel.Value}" />
             </StackPanel>
 
             <Button Content="抽出"

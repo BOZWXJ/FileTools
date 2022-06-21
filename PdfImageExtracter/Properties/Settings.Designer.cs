@@ -82,5 +82,53 @@ namespace PdfImageExtracter.Properties {
                 this["WindowLocationHeight"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MakeSubFolder {
+            get {
+                return ((bool)(this["MakeSubFolder"]));
+            }
+            set {
+                this["MakeSubFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ResizeImage {
+            get {
+                return ((bool)(this["ResizeImage"]));
+            }
+            set {
+                this["ResizeImage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ResizeMode {
+            get {
+                return ((int)(this["ResizeMode"]));
+            }
+            set {
+                this["ResizeMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1400")]
+        public int ResizePixel {
+            get {
+                return ((int)(this["ResizePixel"]));
+            }
+            set {
+                this["ResizePixel"] = value;
+            }
+        }
     }
 }

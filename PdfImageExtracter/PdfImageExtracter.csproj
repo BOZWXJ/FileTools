@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="BitMiracle.LibTiff.NET" Version="2.4.649" />
-    <PackageReference Include="itext7" Version="7.2.2" />
     <PackageReference Include="LivetCask" Version="4.0.2" />
     <PackageReference Include="LivetExtensions" Version="4.0.2" />
     <PackageReference Include="ModernWpfUI" Version="0.9.5" />

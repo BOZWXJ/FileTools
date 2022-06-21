@@ -1,5 +1,6 @@
 ﻿using BitMiracle.LibTiff.Classic;
 using Livet;
+using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,14 +18,17 @@ namespace PdfImageExtracter.Models
 {
 	public class FileToolsModel : NotificationObject
 	{
-		public void ExtractImage()
-		{
-			string srcFile = @"D:\Users\mitamura\Pictures\tmp\test.pdf";
-			string dstFolder = @"D:\Users\mitamura\Pictures\tmp";
+		public ReactivePropertySlim<string> StatusMessage { get; } = new();
 
+		public void ExtractImage(string srcFile, string dstFolder, bool makeSubFolder, int resize)
+		{
 			using (PdfDocument document = PdfDocument.Open(srcFile)) {
-				string folder = Path.Combine(dstFolder, Path.GetFileNameWithoutExtension(srcFile));
-				Directory.CreateDirectory(folder);
+				string srcName = Path.GetFileNameWithoutExtension(srcFile);
+				string folder = dstFolder;
+				if (makeSubFolder) {
+					folder = Path.Combine(dstFolder, srcName);
+					Directory.CreateDirectory(folder);
+				}
 				foreach (Page page in document.GetPages()) {
 					int rotate = 0;
 					if (page.Dictionary.TryGet(NameToken.Rotate, out NumericToken token)) {
@@ -33,12 +37,12 @@ namespace PdfImageExtracter.Models
 
 					var images = page.GetImages();
 					foreach (var (image, j) in images.Select((o, i) => (o, i))) {
-						System.Diagnostics.Debug.WriteLine($"page={page.Number} Rotate={rotate} {j},{image}");
+						System.Diagnostics.Debug.WriteLine($"page={page.Number}-{j} Rotate={rotate},{image}");
+						StatusMessage.Value = $"{page.Number}/{document.NumberOfPages} {srcName}";
 
 						if (image.ImageDictionary.TryGet(NameToken.Filter, out NameToken imageToken)) {
-							string name = $"{page.Number:d3}{(images.Count() > 1 ? $"_{j}" : "")}";
+							string name = $"{(makeSubFolder ? "" : $"{srcName} ")}{page.Number:d3}{(images.Count() > 1 ? $"_{j}" : "")}";
 							string path = Path.Combine(folder, name);
-
 							byte[] bytes;
 							if (imageToken == NameToken.DctDecode) {
 								bytes = image.RawBytes.ToArray();
@@ -54,12 +58,17 @@ namespace PdfImageExtracter.Models
 								bmp.CacheOption = BitmapCacheOption.OnLoad;
 								bmp.CreateOptions = BitmapCreateOptions.None;
 								bmp.StreamSource = ms;
-								if (rotate == 90  || rotate == 270) {
-									bmp.DecodePixelHeight = (int)Math.Round(1400.0 / image.Bounds.Width * image.Bounds.Height);
-									bmp.DecodePixelWidth = 1400;
-								} else {
-									bmp.DecodePixelHeight = 1400;
-									bmp.DecodePixelWidth = (int)Math.Round(1400.0 / image.Bounds.Height * image.Bounds.Width);
+								if (resize != 0) {
+									int px = Math.Abs(resize);
+									if ((resize > 0 && (rotate == 0 || rotate == 180)) || (resize < 0 && (rotate == 90 || rotate == 270))) {
+										// 縦かつ回転無し or 横かつ90度回転
+										bmp.DecodePixelHeight = px;
+										bmp.DecodePixelWidth = (int)Math.Round(px / image.Bounds.Height * image.Bounds.Width);
+									} else {
+										// 縦かつ90度回転 or 横かつ回転無し
+										bmp.DecodePixelHeight = (int)Math.Round(px / image.Bounds.Width * image.Bounds.Height);
+										bmp.DecodePixelWidth = px;
+									}
 								}
 								bmp.Rotation = rotate switch {
 									90 => Rotation.Rotate90,
@@ -71,17 +80,16 @@ namespace PdfImageExtracter.Models
 								bmp.Freeze();
 							}
 							path = Path.Combine(folder, Path.ChangeExtension($"{name}", "jpg"));
-							using (FileStream fs = new(path, FileMode.Create)) {
-								BitmapEncoder encoder = new JpegBitmapEncoder();
-								encoder.Frames.Add(BitmapFrame.Create(bmp));
-								encoder.Save(fs);
-							}
-
+							using FileStream fs = new(path, FileMode.Create);
+							BitmapEncoder encoder = new JpegBitmapEncoder();
+							encoder.Frames.Add(BitmapFrame.Create(bmp));
+							encoder.Save(fs);
 						}
 					}
 				}
 			}
 			System.Diagnostics.Debug.WriteLine("ExtractImage");
+			StatusMessage.Value = "";
 		}
 
 		private static byte[] ConvertTiff(string folder, IPdfImage image)
@@ -103,7 +111,7 @@ namespace PdfImageExtracter.Models
 					}
 				}
 			}
-			string tmpPath = Path.Combine(folder, Path.GetTempFileName());
+			string tmpPath = Path.GetTempFileName();
 			byte[] tmp = image.RawBytes.ToArray();
 			using (Tiff tiff = Tiff.Open(tmpPath, "w")) {
 				tiff.SetField(TiffTag.IMAGEWIDTH, wid);
