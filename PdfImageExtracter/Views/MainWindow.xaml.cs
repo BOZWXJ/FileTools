@@ -1,4 +1,5 @@
 ﻿using PdfImageExtracter.Properties;
+using PdfImageExtracter.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -54,6 +55,16 @@ namespace PdfImageExtracter.Views
 			Settings.Default.WindowLocationWidth = (int)Width;
 			Settings.Default.WindowLocationHeight = (int)Height;
 			Settings.Default.Save();
+		}
+
+		private void Label_DragOver(object sender, DragEventArgs e)
+		{
+			((MainWindowViewModel)DataContext).DragOverCommand.Execute(e);
+		}
+
+		private void Label_Drop(object sender, DragEventArgs e)
+		{
+			((MainWindowViewModel)DataContext).DropCommand.Execute(e);
 		}
 	}
 }
