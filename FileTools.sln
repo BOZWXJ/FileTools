@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfImageExtracter", "PdfImageExtracter\PdfImageExtracter.csproj", "{2C4E0300-EBE9-4404-BB3C-7AE09EFE5484}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileEraser", "FileEraser\FileEraser.csproj", "{2EBDBB0E-6AB1-4A80-BA6F-C09FD7AA8E10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2C4E0300-EBE9-4404-BB3C-7AE09EFE5484}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C4E0300-EBE9-4404-BB3C-7AE09EFE5484}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C4E0300-EBE9-4404-BB3C-7AE09EFE5484}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EBDBB0E-6AB1-4A80-BA6F-C09FD7AA8E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EBDBB0E-6AB1-4A80-BA6F-C09FD7AA8E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EBDBB0E-6AB1-4A80-BA6F-C09FD7AA8E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EBDBB0E-6AB1-4A80-BA6F-C09FD7AA8E10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

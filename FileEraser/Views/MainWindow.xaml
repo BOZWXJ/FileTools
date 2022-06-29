@@ -1,0 +1,161 @@
+﻿<Window x:Class="FileEraser.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:av="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:v="clr-namespace:FileEraser.Views"
+        xmlns:vm="clr-namespace:FileEraser.ViewModels"
+        Title="MainWindow"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Width="525"
+        Height="350"
+        ResizeMode="CanResizeWithGrip"
+        mc:Ignorable="av">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+
+    <behaviors:Interaction.Triggers>
+        <!--  When ContentRendered event raised, Initialize method of ViewModel would be called.  -->
+        <behaviors:EventTrigger EventName="ContentRendered">
+            <l:LivetCallMethodAction MethodName="Initialize"
+                                     MethodTarget="{Binding}" />
+        </behaviors:EventTrigger>
+
+        <!--  Dispose method is called, when Window closing.  -->
+        <behaviors:EventTrigger EventName="Closed">
+            <l:DataContextDisposeAction />
+        </behaviors:EventTrigger>
+
+        <l:InteractionMessageTrigger MessageKey="WindowAction"
+                                     Messenger="{Binding Messenger}">
+            <l:WindowInteractionMessageAction />
+        </l:InteractionMessageTrigger>
+
+        <l:InteractionMessageTrigger MessageKey="FolderSelect"
+                                     Messenger="{Binding Messenger}">
+            <l:FolderBrowserDialogInteractionMessageAction />
+        </l:InteractionMessageTrigger>
+
+        <l:InteractionMessageTrigger MessageKey="ShowEditDialog"
+                                     Messenger="{Binding Messenger}">
+            <l:TransitionInteractionMessageAction Mode="Modal"
+                                                  WindowType="{x:Type v:EditDialog}" />
+        </l:InteractionMessageTrigger>
+
+    </behaviors:Interaction.Triggers>
+
+    <behaviors:Interaction.Behaviors>
+        <l:WindowCloseCancelBehavior CanClose="{Binding CanClose.Value}"
+                                     CloseCanceledCallbackCommand="{Binding CloseCanceledCallbackCommand}" />
+    </behaviors:Interaction.Behaviors>
+
+    <Window.Resources>
+        <Style x:Key="HideHeaderStyle"
+               TargetType="{x:Type GridViewColumnHeader}">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <ProgressBar Width="100"
+                         Maximum="{Binding ProgressMax.Value, Mode=OneWay}"
+                         Visibility="{Binding ProgressBarVisibility.Value, Mode=OneWay}"
+                         Value="{Binding Progress.Value, Mode=OneWay}" />
+            <TextBlock Text="{Binding StatusMessage.Value}" />
+        </StatusBar>
+
+        <Grid Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="処理フォルダ"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Margin="3"
+                   VerticalAlignment="Center" />
+
+            <Grid Grid.Row="0"
+                  Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0"
+                         Margin="3"
+                         AllowDrop="True"
+                         IsEnabled="{Binding CanExecute.Value}"
+                         PreviewDragOver="TextBox_PreviewDragOver"
+                         PreviewDrop="TextBox_PreviewDrop"
+                         Text="{Binding EraseFolder.Value}" />
+                <Button Content="..."
+                        Grid.Column="1"
+                        Margin="3"
+                        HorizontalAlignment="Right"
+                        Command="{Binding FolderSelectCommand}"
+                        IsEnabled="{Binding CanExecute.Value}" />
+            </Grid>
+
+            <CheckBox Content="サブフォルダ以下も対象"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      Margin="3"
+                      IsChecked="{Binding SearchSubFolder.Value}" />
+
+            <Label Content="条件設定"
+                   Grid.Row="2"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Margin="3" />
+
+            <Border Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="3"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                    BorderThickness="1"
+                    CornerRadius="2">
+                <ListView ItemsSource="{Binding FileSelectorList}"
+                          SelectedIndex="{Binding FileSelectorListSelectedIndex.Value}">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding AddFileSelectorItemCommand}"
+                                      Header="新規..." />
+                            <MenuItem Command="{Binding EditFileSelectorItemCommand}"
+                                      Header="編集..." />
+                            <MenuItem Command="{Binding DeleteFileSelectorItemCommand}"
+                                      Header="削除" />
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="False"
+                                  ColumnHeaderContainerStyle="{StaticResource HideHeaderStyle}">
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Description}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+
+            <Button Content="削除実行"
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="3" />
+
+        </Grid>
+    </DockPanel>
+</Window>

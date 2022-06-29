@@ -28,7 +28,7 @@ namespace PdfImageExtracter.Models
 		public ReactivePropertySlim<int> ProgressMax { get; } = new();
 		public ReactivePropertySlim<int> Progress { get; } = new();
 
-		public void Method(string[] files, string dstPath, bool makeSubFolder, ResizeMode mode, int size)
+		public void Method(string[] files, string dstPath, bool makeSubFolder, ResizeMode mode, int size, bool saveRaw)
 		{
 			CanExecute.Value = false;
 
@@ -36,7 +36,7 @@ namespace PdfImageExtracter.Models
 			Progress.Value = 0;
 			fileCount = 0;
 			foreach (var file in files) {
-				ExtractImage(file, dstPath, makeSubFolder, mode, size);
+				ExtractImage(file, dstPath, makeSubFolder, mode, size, saveRaw);
 				fileCount++;
 			}
 			CanExecute.Value = true;
@@ -49,7 +49,7 @@ namespace PdfImageExtracter.Models
 			Progress.Value = fileCount * 100 + 100 * num / page;
 		}
 
-		private void ExtractImage(string srcFile, string dstFolder, bool makeSubFolder, ResizeMode mode, int size)
+		private void ExtractImage(string srcFile, string dstFolder, bool makeSubFolder, ResizeMode mode, int pixel, bool saveRaw)
 		{
 			using (PdfDocument document = PdfDocument.Open(srcFile)) {
 				string srcName = Path.GetFileNameWithoutExtension(srcFile);
@@ -65,27 +65,30 @@ namespace PdfImageExtracter.Models
 						rotate = token.Int;
 					}
 					var images = page.GetImages();
-					foreach (var (image, j) in images.Select((o, i) => (o, i))) {
+					foreach ((IPdfImage image, int j) in images.Select((o, i) => (o, i))) {
 						System.Diagnostics.Debug.WriteLine($"page={page.Number}-{j} Rotate={rotate},{image}");
 
 						if (image.ImageDictionary.TryGet(NameToken.Filter, out NameToken imageToken)) {
 							string name = $"{(makeSubFolder ? "" : $"{srcName} ")}{page.Number:d3}{(images.Count() > 1 ? $"_{j}" : "")}";
 							string path = Path.Combine(folder, name);
-							Size imageSize;
+							Size size;
 							byte[] bytes;
 							if (imageToken == NameToken.DctDecode) {
 								image.ImageDictionary.TryGet(NameToken.Width, out IToken tok);
 								int w = ((NumericToken)tok).Int;
 								image.ImageDictionary.TryGet(NameToken.Height, out tok);
 								int h = ((NumericToken)tok).Int;
-								imageSize = new(w, h);
+								size = new(w, h);
 								bytes = image.RawBytes.ToArray();
 							} else if (imageToken == NameToken.CcittfaxDecode) {
-								(imageSize, bytes) = ConvertTiff(image);
+								(size, bytes) = ConvertTiff(image);
 							} else {
 								continue;
 							}
-							BitmapImage bmp = MakeBitmap(imageSize, bytes, mode, size, rotate);
+							if (saveRaw) {
+								SaveRawData(bytes, folder, name);
+							}
+							BitmapImage bmp = MakeBitmap(size, bytes, mode, pixel, rotate);
 
 							path = Path.Combine(folder, Path.ChangeExtension($"{name}", "jpg"));
 							using FileStream fs = new(path, FileMode.Create);
@@ -141,7 +144,7 @@ namespace PdfImageExtracter.Models
 			using (MemoryStream ms = new(bytes)) {
 				bmp.BeginInit();
 				bmp.CacheOption = BitmapCacheOption.OnLoad;
-				bmp.CreateOptions = BitmapCreateOptions.None;
+				bmp.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
 				bmp.StreamSource = ms;
 
 				if ((mode == ResizeMode.Height && (rotate == 0 || rotate == 180)) || (mode == ResizeMode.Width && (rotate == 90 || rotate == 270))) {
@@ -171,5 +174,29 @@ namespace PdfImageExtracter.Models
 
 			return bmp;
 		}
+
+		private void SaveRawData(byte[] bytes, string dstFolder, string fileName)
+		{
+			// png  89 50 4E 47
+			// jpeg FF D8
+			// gif  47 49 46
+			// bmp  42 4D
+			// tiff 49 49 2a 00 or 4d 4d 00 2a
+			string ext = "bin";
+			if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x50 && bytes[3] == 0x50) {
+				ext = "png";
+			} else if (bytes[0] == 0xff && bytes[1] == 0xd8) {
+				ext = "jpg";
+			} else if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46) {
+				ext = "gif";
+			} else if (bytes[0] == 0x42 && bytes[1] == 0x4d) {
+				ext = "bmp";
+			} else if ((bytes[0] == 0x49 && bytes[1] == 0x49 && bytes[2] == 0x2a && bytes[3] == 0x00) || (bytes[0] == 0x4d && bytes[1] == 0x4d && bytes[2] == 0x00 && bytes[3] == 0x2a)) {
+				ext = "tiff";
+			}
+			string path = Path.Combine(dstFolder, Path.ChangeExtension($"{Path.GetFileNameWithoutExtension(fileName)}_raw", ext));
+			File.WriteAllBytes(path, bytes);
+		}
+
 	}
 }

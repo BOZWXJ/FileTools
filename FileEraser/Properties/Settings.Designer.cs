@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PdfImageExtracter.Properties {
+namespace FileEraser.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -20,18 +20,6 @@ namespace PdfImageExtracter.Properties {
         public static Settings Default {
             get {
                 return defaultInstance;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string OutputFolder {
-            get {
-                return ((string)(this["OutputFolder"]));
-            }
-            set {
-                this["OutputFolder"] = value;
             }
         }
         
@@ -85,61 +73,38 @@ namespace PdfImageExtracter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool MakeSubFolder {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string EraseFolder {
             get {
-                return ((bool)(this["MakeSubFolder"]));
+                return ((string)(this["EraseFolder"]));
             }
             set {
-                this["MakeSubFolder"] = value;
+                this["EraseFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" />")]
+        public global::System.Collections.Specialized.StringCollection SettingList {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["SettingList"]));
+            }
+            set {
+                this["SettingList"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ResizeImage {
+        public bool SearchSubFolder {
             get {
-                return ((bool)(this["ResizeImage"]));
+                return ((bool)(this["SearchSubFolder"]));
             }
             set {
-                this["ResizeImage"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int ResizeMode {
-            get {
-                return ((int)(this["ResizeMode"]));
-            }
-            set {
-                this["ResizeMode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1400")]
-        public int ResizePixel {
-            get {
-                return ((int)(this["ResizePixel"]));
-            }
-            set {
-                this["ResizePixel"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool SaveRawData {
-            get {
-                return ((bool)(this["SaveRawData"]));
-            }
-            set {
-                this["SaveRawData"] = value;
+                this["SearchSubFolder"] = value;
             }
         }
     }

@@ -64,6 +64,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -137,6 +138,14 @@
                               TextAlignment="Right"
                               Value="{Binding ResizePixel.Value}" />
             </StackPanel>
+
+            <CheckBox Content="RAW データ保存"
+                      Grid.Row="4"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="3"
+                      Margin="3"
+                      IsChecked="{Binding SaveRawData.Value}"
+                      IsEnabled="{Binding CanExecute.Value}" />
 
         </Grid>
     </DockPanel>

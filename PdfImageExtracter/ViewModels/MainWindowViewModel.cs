@@ -37,6 +37,7 @@ namespace PdfImageExtracter.ViewModels
 		public ReactivePropertySlim<bool> ResizeImage { get; } = new();
 		public ReactivePropertySlim<int> ResizeMode { get; } = new();
 		public ReactivePropertySlim<int> ResizePixel { get; } = new();
+		public ReactivePropertySlim<bool> SaveRawData { get; } = new();
 
 		// StatusBar
 		public ReadOnlyReactiveProperty<string> StatusMessage { get; }
@@ -54,15 +55,16 @@ namespace PdfImageExtracter.ViewModels
 			ResizeEnable = Observable.CombineLatest(CanExecute, ResizeImage, (x, y) => x & y).ToReadOnlyReactiveProperty();
 
 			DragOverCommand.Subscribe(e => {
+				e.Handled = true;
 				if (CanExecute.Value && e.Data.GetDataPresent(DataFormats.FileDrop)) {
 					e.Effects = DragDropEffects.Copy;
 				} else {
 					e.Effects = DragDropEffects.None;
 				}
-				e.Handled = true;
 			});
 
 			DropCommand = CanExecute.ToAsyncReactiveCommand<DragEventArgs>().WithSubscribe(async e => {
+				e.Handled = true;
 				if (e.Data.GetData(DataFormats.FileDrop) is not string[] list || list.Length == 0) {
 					return;
 				}
@@ -70,7 +72,7 @@ namespace PdfImageExtracter.ViewModels
 				if (ResizeImage.Value) {
 					mode = (ResizeMode.Value == 0) ? PdfImageExtracterModel.ResizeMode.Height : PdfImageExtracterModel.ResizeMode.Width;
 				}
-				await Task.Run(() => model.Method(list, OutputFolder.Value, MakeSubFolder.Value, mode, ResizePixel.Value));
+				await Task.Run(() => model.Method(list, OutputFolder.Value, MakeSubFolder.Value, mode, ResizePixel.Value, SaveRawData.Value));
 			});
 
 			FolderSelectCommand.Subscribe(() => {
@@ -87,11 +89,15 @@ namespace PdfImageExtracter.ViewModels
 			ProgressBarVisibility = CanExecute.Select(p => p ? Visibility.Collapsed : Visibility.Visible).ToReadOnlyReactivePropertySlim();
 
 			CloseCanceledCallbackCommand.Subscribe(async () => {
+				if (!CanExecute.Value) {
+					return;
+				}
 				Settings.Default.OutputFolder = OutputFolder.Value;
 				Settings.Default.MakeSubFolder = MakeSubFolder.Value;
 				Settings.Default.ResizeImage = ResizeImage.Value;
 				Settings.Default.ResizeMode = ResizeMode.Value;
 				Settings.Default.ResizePixel = ResizePixel.Value;
+				Settings.Default.SaveRawData = SaveRawData.Value;
 				Settings.Default.Save();
 				CanClose.Value = true;
 				await Messenger.RaiseAsync(new WindowActionMessage(WindowAction.Close, "WindowAction"));
@@ -113,6 +119,7 @@ namespace PdfImageExtracter.ViewModels
 				_ => 0,
 			};
 			ResizePixel.Value = Settings.Default.ResizePixel;
+			SaveRawData.Value = Settings.Default.SaveRawData;
 		}
 	}
 }
