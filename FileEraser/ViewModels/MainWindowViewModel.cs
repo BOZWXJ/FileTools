@@ -37,7 +37,7 @@ namespace FileEraser.ViewModels
 		public ReactivePropertySlim<string> EraseFolder { get; } = new();
 		public ReactivePropertySlim<bool> SearchSubFolder { get; } = new();
 		public ReadOnlyReactiveCollection<FileSelectorListItemViewModel> FileSelectorList { get; }
-		public ReactivePropertySlim<int> FileSelectorListSelectedIndex { get; } = new();
+		public ReactivePropertySlim<FileSelectorListItemViewModel> FileSelectorListSelectedItem { get; } = new();
 		public ReadOnlyReactivePropertySlim<bool> CanEditFileSelectorItem { get; }
 		public ReactiveCommand AddFileSelectorItemCommand { get; } = new();
 		public ReactiveCommand EditFileSelectorItemCommand { get; } = new();
@@ -57,6 +57,7 @@ namespace FileEraser.ViewModels
 		{
 			model = new();
 
+			// 削除処理
 			CanExecute = model.CanExecute.ToReadOnlyReactiveProperty();
 			FileDeleteCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
 				await Task.Run(() => model.Method(EraseFolder.Value, SearchSubFolder.Value));
@@ -82,7 +83,7 @@ namespace FileEraser.ViewModels
 
 			// 設定
 			FolderSelectCommand.Subscribe(() => {
-				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "削除処理フォルダの選択", Response = new string[] { EraseFolder.Value } };
+				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "削除処理フォルダの選択", SelectedPath = EraseFolder.Value };
 				Messenger.Raise(msg);
 				if (msg.Response != null) {
 					EraseFolder.Value = msg.Response.FirstOrDefault();
@@ -90,17 +91,30 @@ namespace FileEraser.ViewModels
 			});
 
 			FileSelectorList = model.FileSelectorList.ToReadOnlyReactiveCollection(p => new FileSelectorListItemViewModel(p));
-			CanEditFileSelectorItem = FileSelectorListSelectedIndex.Select(p => p >= 0).ToReadOnlyReactivePropertySlim();
+			CanEditFileSelectorItem = FileSelectorListSelectedItem.Select(p => p != null).ToReadOnlyReactivePropertySlim();
 			AddFileSelectorItemCommand.Subscribe(() => {
-				// todo: 新規
-				Messenger.Raise(new TransitionMessage(new EditDialogViewModel(), "ShowEditDialog"));
+				var msg = new TransitionMessage(new EditDialogViewModel(), TransitionMode.Modal, "ShowEditDialog");
+				Messenger.Raise(msg);
+				if (msg.Response ?? false) {
+					var item = ((EditDialogViewModel)msg.TransitionViewModel).GetNewSelector();
+					if (item != null) {
+						model.AddFileSelectorItem(item);
+					}
+				}
 			});
 			EditFileSelectorItemCommand = CanEditFileSelectorItem.ToReactiveCommand().WithSubscribe(() => {
-				// todo: 編集
-				Messenger.Raise(new TransitionMessage(new EditDialogViewModel(), "ShowEditDialog"));
+				var msg = new TransitionMessage(new EditDialogViewModel(FileSelectorListSelectedItem.Value.Selector), TransitionMode.Modal, "ShowEditDialog");
+				Messenger.Raise(msg);
+				if (msg.Response ?? false) {
+					var item = ((EditDialogViewModel)msg.TransitionViewModel).GetNewSelector();
+					if (item != null) {
+						model.DeleteFileSelectorItem(((EditDialogViewModel)msg.TransitionViewModel).GetOldSelector());
+						model.AddFileSelectorItem(item);
+					}
+				}
 			});
 			DeleteFileSelectorItemCommand = CanEditFileSelectorItem.ToReactiveCommand().WithSubscribe(() => {
-				model.DeleteFileSelectorItem(FileSelectorListSelectedIndex.Value);
+				model.DeleteFileSelectorItem(FileSelectorListSelectedItem.Value.Selector);
 			});
 
 			// StatusBar

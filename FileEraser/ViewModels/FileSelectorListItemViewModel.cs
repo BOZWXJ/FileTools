@@ -19,10 +19,12 @@ namespace FileEraser.ViewModels
 	{
 		public ReadOnlyReactivePropertySlim<string> Description { get; }
 
-		public FileSelectorListItemViewModel() { }
+		public IFileSelector Selector { get; }
+
 		public FileSelectorListItemViewModel(IFileSelector item)
 		{
 			Description = item.ObserveProperty(p => p.Description).ToReadOnlyReactivePropertySlim();
+			Selector = item;
 		}
 	}
 }

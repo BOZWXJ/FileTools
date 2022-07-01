@@ -15,32 +15,53 @@ namespace FileEraser.Models
 		public string Description
 		{
 			get => _Description;
-			set => RaisePropertyChangedIfSet(ref _Description, value);
+			private set => RaisePropertyChangedIfSet(ref _Description, value);
 		}
 		private string _Description;
-
 
 		public string FilePath
 		{
 			get => _FilePath;
 			set
 			{
-				Description = $"正規表現 /{value}/";
+				Description = $"ファイルパス {value}";
 				_FilePath = value;
 			}
 		}
 		private string _FilePath;
 
-		public bool Check(string filePath)
+		private byte[] Contents;
+
+		public bool Check(string path)
 		{
-			// todo: ファイルの内容で判定
-			throw new NotImplementedException();
+			try {
+				if (Contents == null) {
+					Contents = File.ReadAllBytes(FilePath);
+				}
+				byte[] file = File.ReadAllBytes(path);
+				if (Contents.Length != file.Length) {
+					return false;
+				}
+				for (int i = 0; i < Contents.Length; i++) {
+					if (Contents[i] != file[i]) {
+						return false;
+					}
+				}
+			} catch {
+				return false;
+			}
+			return true;
+		}
+
+		public FileSelectorContents(string filePath)
+		{
+			FilePath = filePath;
 		}
 
 		public static FileSelectorContents FromString(string str)
 		{
 			string[] s = str.Split("\t");
-			return new() { FilePath = s[1] };
+			return new(s[1]);
 		}
 
 		public override string ToString()

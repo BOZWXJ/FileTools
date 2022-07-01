@@ -8,6 +8,7 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:v="clr-namespace:FileEraser.Views"
         xmlns:vm="clr-namespace:FileEraser.ViewModels"
+        x:Name="window"
         Title="EditDialog"
         d:DataContext="{d:DesignInstance Type=vm:EditDialogViewModel}"
         ui:WindowHelper.UseModernWindowStyle="True"
@@ -34,7 +35,10 @@
             <l:DataContextDisposeAction />
         </behaviors:EventTrigger>
 
-        <!--  If you make user choose 'OK or Cancel' closing Window, then please use Window Close cancel Behavior.  -->
+        <l:InteractionMessageTrigger MessageKey="WindowAction"
+                                     Messenger="{Binding Messenger}">
+            <l:WindowInteractionMessageAction />
+        </l:InteractionMessageTrigger>
 
     </behaviors:Interaction.Triggers>
 
@@ -60,11 +64,25 @@
                   ItemsSource="{Binding SelectorTypeList}"
                   SelectedIndex="{Binding SelectorTypeListSelectedIndex.Value}" />
 
-        <Frame Grid.Row="1"
-               Grid.Column="0"
-               Grid.ColumnSpan="2"
-               NavigationUIVisibility="Hidden"
-               Source="{Binding SelectorPage.Value}" />
+        <DockPanel Grid.Row="1"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2">
+            <ContentControl Content="{Binding SelectorPage.Value}" />
+            <DockPanel.Resources>
+                <DataTemplate DataType="{x:Type vm:SelectorNameViewModel}">
+                    <v:SelectorNameUserControl />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:SelectorExtViewModel}">
+                    <v:SelectorExtUserControl />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:SelectorDateViewModel}">
+                    <v:SelectorDateUserControl />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:SelectorContentsViewModel}">
+                    <v:SelectorContentsUserControl />
+                </DataTemplate>
+            </DockPanel.Resources>
+        </DockPanel>
 
         <StackPanel Grid.Row="2"
                     Grid.Column="0"
@@ -73,10 +91,20 @@
                     Orientation="Horizontal">
             <Button Content="Ok"
                     Margin="3"
-                    HorizontalAlignment="Right" />
+                    HorizontalAlignment="Right"
+                    IsDefault="True">
+                <behaviors:Interaction.Triggers>
+                    <behaviors:EventTrigger EventName="Click">
+                        <behaviors:ChangePropertyAction PropertyName="DialogResult"
+                                                        TargetName="window"
+                                                        Value="True" />
+                    </behaviors:EventTrigger>
+                </behaviors:Interaction.Triggers>
+            </Button>
             <Button Content="Cancel"
                     Margin="3"
-                    HorizontalAlignment="Right" />
+                    HorizontalAlignment="Right"
+                    IsCancel="True" />
         </StackPanel>
 
     </Grid>

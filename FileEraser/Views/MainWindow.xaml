@@ -43,8 +43,7 @@
 
         <l:InteractionMessageTrigger MessageKey="ShowEditDialog"
                                      Messenger="{Binding Messenger}">
-            <l:TransitionInteractionMessageAction Mode="Modal"
-                                                  WindowType="{x:Type v:EditDialog}" />
+            <l:TransitionInteractionMessageAction WindowType="{x:Type v:EditDialog}" />
         </l:InteractionMessageTrigger>
 
     </behaviors:Interaction.Triggers>
@@ -114,13 +113,37 @@
                       Grid.Row="1"
                       Grid.Column="1"
                       Margin="3"
-                      IsChecked="{Binding SearchSubFolder.Value}" />
+                      IsChecked="{Binding SearchSubFolder.Value}"
+                      IsEnabled="{Binding CanExecute.Value}" />
 
             <Label Content="条件設定"
                    Grid.Row="2"
                    Grid.Column="0"
-                   Grid.ColumnSpan="2"
-                   Margin="3" />
+                   Margin="3"
+                   VerticalAlignment="Center" />
+
+            <!--  todo: FileSelectorList 読込先  -->
+            <Grid Grid.Row="2"
+                  Grid.Column="1"
+                  Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0"
+                         Margin="3"
+                         AllowDrop="True"
+                         IsEnabled="{Binding CanExecute.Value}"
+                         PreviewDragOver="TextBox_PreviewDragOver"
+                         PreviewDrop="TextBox_PreviewDrop"
+                         Text="{Binding EraseFolder.Value}" />
+                <Button Content="..."
+                        Grid.Column="1"
+                        Margin="3"
+                        HorizontalAlignment="Right"
+                        Command="{Binding FolderSelectCommand}"
+                        IsEnabled="{Binding CanExecute.Value}" />
+            </Grid>
 
             <Border Grid.Row="3"
                     Grid.Column="0"
@@ -129,8 +152,9 @@
                     BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                     BorderThickness="1"
                     CornerRadius="2">
-                <ListView ItemsSource="{Binding FileSelectorList}"
-                          SelectedIndex="{Binding FileSelectorListSelectedIndex.Value}">
+                <ListView IsEnabled="{Binding CanExecute.Value}"
+                          ItemsSource="{Binding FileSelectorList}"
+                          SelectedItem="{Binding FileSelectorListSelectedItem.Value}">
                     <ListView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Command="{Binding AddFileSelectorItemCommand}"
@@ -150,11 +174,12 @@
                 </ListView>
             </Border>
 
-            <Button Content="削除実行"
+            <Button Content="ファイル削除"
                     Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
-                    Margin="3" />
+                    Margin="3"
+                    Command="{Binding FileDeleteCommand}" />
 
         </Grid>
     </DockPanel>

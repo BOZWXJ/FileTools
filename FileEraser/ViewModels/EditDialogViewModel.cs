@@ -18,38 +18,42 @@ namespace FileEraser.ViewModels
 	{
 		public string[] SelectorTypeList { get; } = new[] { "ファイル名", "拡張子", "更新日時", "ファイルと一致" };
 		public ReactivePropertySlim<int> SelectorTypeListSelectedIndex { get; } = new();
-		public ReactivePropertySlim<Uri> SelectorPage { get; } = new();
+		public ReactivePropertySlim<bool> ChangeSelectorTypeEnable { get; } = new();
+		public ReactivePropertySlim<ISelectorViewModel> SelectorPage { get; } = new();
 
-		public IFileSelector Selector { get; }
+		private readonly IFileSelector oldSelector;
 
-		public EditDialogViewModel() : this(new FileSelectorName()) { }
+		public EditDialogViewModel() : this(null) { }
 		public EditDialogViewModel(IFileSelector selector)
 		{
-			this.Selector = selector;
+			oldSelector = selector;
 
 			SelectorTypeListSelectedIndex.Subscribe(p => {
-				string page = p switch {
-					0 => "/Views/SelectorNamePage.xaml",
-					1 => "/Views/SelectorExtPage.xaml",
-					2 => "/Views/SelectorDatePage.xaml",
-					3 => "/Views/SelectorContentsPage.xaml",
-					_ => "/Views/SelectorNamePage.xaml",
+				SelectorPage.Value = p switch {
+					(int)FileSelectorTypes.Name => new SelectorNameViewModel(oldSelector as FileSelectorName ),
+					(int)FileSelectorTypes.Ext => new SelectorExtViewModel(oldSelector as FileSelectorExt),
+					(int)FileSelectorTypes.Date => new SelectorDateViewModel(oldSelector as FileSelectorDate),
+					(int)FileSelectorTypes.Contents => new SelectorContentsViewModel(oldSelector as FileSelectorContents),
+					_ => new SelectorNameViewModel(null),
 				};
-				SelectorPage.Value = new Uri(page, UriKind.Relative);
 			});
-
+			ChangeSelectorTypeEnable.Value = selector == null;
 		}
 
 		// This method would be called from View, when ContentRendered event was raised.
 		public void Initialize()
 		{
-			SelectorTypeListSelectedIndex.Value = Selector.SelectorType switch {
-				FileSelectorTypes.Name => 0,
-				FileSelectorTypes.Ext => 1,
-				FileSelectorTypes.Date => 2,
-				FileSelectorTypes.Contents => 3,
-				_ => 0,
-			};
+			SelectorTypeListSelectedIndex.Value = (int)(oldSelector?.SelectorType ?? FileSelectorTypes.Name);
+		}
+
+		public IFileSelector GetOldSelector()
+		{
+			return oldSelector;
+		}
+
+		public IFileSelector GetNewSelector()
+		{
+			return SelectorPage.Value.GetFileSelector();
 		}
 
 	}

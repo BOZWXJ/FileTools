@@ -13,7 +13,7 @@ namespace FileEraser.Models
 		public string Description
 		{
 			get => _Description;
-			set => RaisePropertyChangedIfSet(ref _Description, value);
+			private set => RaisePropertyChangedIfSet(ref _Description, value);
 		}
 		private string _Description;
 

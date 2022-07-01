@@ -16,7 +16,7 @@ namespace FileEraser.Models
 	public interface IFileSelector : INotifyPropertyChanged
 	{
 		public FileSelectorTypes SelectorType { get; }
-		public string Description { get; set; }
+		public string Description { get; }
 
 		public bool Check(string filePath);
 	}

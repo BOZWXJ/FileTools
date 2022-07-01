@@ -16,7 +16,7 @@ namespace FileEraser.Models
 		public string Description
 		{
 			get => _Description;
-			set => RaisePropertyChangedIfSet(ref _Description, value);
+			private set => RaisePropertyChangedIfSet(ref _Description, value);
 		}
 		private string _Description;
 
@@ -33,13 +33,18 @@ namespace FileEraser.Models
 
 		public bool Check(string filePath)
 		{
-			return Regex.IsMatch(Path.GetFileName(filePath), Pattern);
+			return Regex.IsMatch(Path.GetFileName(filePath), Pattern, RegexOptions.IgnoreCase);
+		}
+
+		public FileSelectorName(string pattern)
+		{
+			Pattern = pattern;
 		}
 
 		public static FileSelectorName FromString(string str)
 		{
 			string[] s = str.Split("\t");
-			return new() { Pattern = s[1] };
+			return new(s[1]);
 		}
 
 		public override string ToString()

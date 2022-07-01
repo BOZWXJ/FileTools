@@ -15,7 +15,7 @@ namespace FileEraser.Models
 		public string Description
 		{
 			get => _Description;
-			set => RaisePropertyChangedIfSet(ref _Description, value);
+			private set => RaisePropertyChangedIfSet(ref _Description, value);
 		}
 		private string _Description;
 
@@ -35,10 +35,15 @@ namespace FileEraser.Models
 			return Path.GetExtension(filePath).TrimStart('.').Equals(Extension, StringComparison.OrdinalIgnoreCase);
 		}
 
+		public FileSelectorExt(string extension)
+		{
+			Extension = extension;
+		}
+
 		public static FileSelectorExt FromString(string str)
 		{
 			string[] s = str.Split("\t");
-			return new() { Extension = s[1] };
+			return new(s[1]);
 		}
 
 		public override string ToString()

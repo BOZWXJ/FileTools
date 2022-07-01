@@ -25,21 +25,39 @@ namespace FileEraser.Models
 
 		public void Method(string eraseFolder, bool subFolder)
 		{
+			CanExecute.Value = false;
+
 			List<string> files = new();
 			files.AddRange(Directory.GetFiles(eraseFolder));
 			if (subFolder) {
-				// todo: サブフォルダ
+				Queue<string> queue = new(Directory.GetDirectories(eraseFolder));
+				while (queue.Count > 0) {
+					var dir = queue.Dequeue();
+					files.AddRange(Directory.GetFiles(dir));
+					foreach (var sub in Directory.GetDirectories(dir)) {
+						queue.Enqueue(sub);
+					}
+				}
 			}
+			ProgressMax.Value = files.Count;
+			Progress.Value = 0;
 			foreach (var file in files) {
+				StatusMessage.Value = $"{file.Substring(eraseFolder.Length)}";
+				Progress.Value++;
 				if (FileSelectorList.Any(p => p.Check(file))) {
 					System.Diagnostics.Debug.WriteLine($"削除 {file}");
 					// todo: ファイル削除処理
+
 				}
 			}
+			StatusMessage.Value = "";
+
+			CanExecute.Value = true;
 		}
 
 		public void SaveSettingList()
 		{
+			// todo: FileSelectorList を別ファイルに保存
 			Settings.Default.SettingList.Clear();
 			foreach (var item in FileSelectorList) {
 				Settings.Default.SettingList.Add(item.ToString());
@@ -48,6 +66,7 @@ namespace FileEraser.Models
 
 		public void LoadSettingList()
 		{
+			// todo: FileSelectorList を別ファイルから読込
 			FileSelectorList.Clear();
 			foreach (var item in Settings.Default.SettingList) {
 				IFileSelector selector = null;
@@ -69,6 +88,7 @@ namespace FileEraser.Models
 		public void AddFileSelectorItem(IFileSelector selector)
 		{
 			FileSelectorList.Add(selector);
+			// todo: FileSelector 優先順位でソート
 			System.Diagnostics.Debug.WriteLine($"AddFileSelectorItem {FileSelectorList.Count}");
 		}
 
@@ -79,9 +99,9 @@ namespace FileEraser.Models
 			System.Diagnostics.Debug.WriteLine($"EditFileSelectorItem {FileSelectorList.Count}");
 		}
 
-		public void DeleteFileSelectorItem(int index)
+		public void DeleteFileSelectorItem(IFileSelector selector)
 		{
-			FileSelectorList.RemoveAt(index);
+			FileSelectorList.Remove(selector);
 			System.Diagnostics.Debug.WriteLine($"DeleteFileSelectorItem {FileSelectorList.Count}");
 		}
 

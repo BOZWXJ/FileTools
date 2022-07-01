@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace FileEraser.Views
 {
 	/// <summary>
-	/// SelectorContentsPage.xaml の相互作用ロジック
+	/// SelectorContentsUserControl.xaml の相互作用ロジック
 	/// </summary>
-	public partial class SelectorContentsPage : Page
+	public partial class SelectorContentsUserControl : UserControl
 	{
-		public SelectorContentsPage()
+		public SelectorContentsUserControl()
 		{
 			InitializeComponent();
 		}
