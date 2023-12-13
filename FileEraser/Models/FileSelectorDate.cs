@@ -1,6 +1,7 @@
 ﻿using Livet;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -17,34 +18,50 @@ namespace FileEraser.Models
 		}
 		private string _Description;
 
-		// < > <= >=
-
-		public DateTime Date
+		public int Days
 		{
-			get => _Date;
+			get => _Days;
 			set
 			{
-				Description = $"{Date}";
-				_Date = value;
+				Description = $"更新日時 {Comparison} {Days}";
+				RaisePropertyChangedIfSet(ref _Days, value);
 			}
 		}
-		private DateTime _Date;
+		private int _Days;
+
+		/// <summary>
+		/// 以内 or 以降
+		/// </summary>
+		public string Comparison
+		{
+			get => _Comparison;
+			set
+			{
+				Description = $"更新日時 {Comparison} {Days}";
+				RaisePropertyChangedIfSet(ref _Comparison, value);
+			}
+		}
+		private string _Comparison;
 
 		public bool Check(string filePath)
 		{
-			// todo: 更新日時で判定
-			throw new NotImplementedException();
+			var t = DateTime.Now.Date - File.GetLastWriteTime(filePath).Date;
+			return Comparison switch {
+				"<" => t.TotalDays < Days,
+				">" => t.TotalDays > Days,
+				_ => false,
+			};
 		}
 
 		public static FileSelectorDate FromString(string str)
 		{
 			string[] s = str.Split("\t");
-			return new() { Date = DateTime.Parse(s[1]) };
+			return new() { Days = int.Parse(s[1]), Comparison = s[2] };
 		}
 
 		public override string ToString()
 		{
-			return $"{SelectorType}\t{Date}";
+			return $"{SelectorType}\t{Days}\t{Comparison}";
 		}
 
 	}

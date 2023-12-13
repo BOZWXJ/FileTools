@@ -10,7 +10,7 @@
     <PackageReference Include="LivetCask" Version="4.0.2" />
     <PackageReference Include="LivetExtensions" Version="4.0.2" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
-    <PackageReference Include="ReactiveProperty.WPF" Version="8.1.2" />
+    <PackageReference Include="ReactiveProperty.WPF" Version="9.3.4" />
   </ItemGroup>
 
   <ItemGroup>

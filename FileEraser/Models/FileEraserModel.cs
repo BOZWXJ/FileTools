@@ -42,7 +42,7 @@ namespace FileEraser.Models
 			ProgressMax.Value = files.Count;
 			Progress.Value = 0;
 			foreach (var file in files) {
-				StatusMessage.Value = $"{file.Substring(eraseFolder.Length)}";
+				StatusMessage.Value = $"{file[eraseFolder.Length..]}";
 				Progress.Value++;
 				if (FileSelectorList.Any(p => p.Check(file))) {
 					System.Diagnostics.Debug.WriteLine($"削除 {file}");
