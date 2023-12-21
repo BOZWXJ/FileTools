@@ -51,6 +51,8 @@ namespace FileOrganizer.ViewModels
 
 			// ファイル名修正
 			RenameCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
+				StatusMessage.Value = string.Empty;
+				Progress.Value = 0;
 				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = Rename.SelectedPath };
 				Messenger.Raise(msg);
 				if (msg.Response != null) {
@@ -60,6 +62,8 @@ namespace FileOrganizer.ViewModels
 			});
 			// 各サブフォルダに集める
 			CollectFilesCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
+				StatusMessage.Value = string.Empty;
+				Progress.Value = 0;
 				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = CollectFiles.SelectedPath };
 				Messenger.Raise(msg);
 				if (msg.Response != null) {
@@ -69,6 +73,8 @@ namespace FileOrganizer.ViewModels
 			});
 			// フォルダ個別 zip 作成
 			ZipCompressCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
+				StatusMessage.Value = string.Empty;
+				Progress.Value = 0;
 				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = ZipCompress.SelectedPath };
 				Messenger.Raise(msg);
 				if (msg.Response != null) {
