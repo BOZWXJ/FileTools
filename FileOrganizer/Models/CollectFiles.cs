@@ -1,4 +1,5 @@
 ﻿using FileOrganizer.Properties;
+using FileOrganizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,9 +29,9 @@ namespace FileOrganizer.Models
 			var items = Directory.GetDirectories(SelectedPath);
 			var c = items.Length;
 			var queue = new Queue<string>();
-			foreach (var (item, i) in items.Select((s, i) => (s, i))) {
+			foreach (var (item, i) in items.OrderBy(p => p, new LogicalCompare()).Select((s, i) => (s, i))) {
 				// 進行状況
-				progress.Report(new(i, c, $"{i}/{c}:{Path.GetFileName(item)}"));
+				progress.Report(new(i + 1, c, $"{i + 1}/{c}:{Path.GetFileName(item)}"));
 				// ファイル処理
 				queue.Enqueue(item);
 				// ファイル移動

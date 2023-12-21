@@ -1,4 +1,5 @@
 ﻿using FileOrganizer.Properties;
+using FileOrganizer.Utility;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -27,12 +28,14 @@ namespace FileOrganizer.Models
 			Log.Append($"処理フォルダ {SelectedPath}");
 			var items = Directory.GetDirectories(SelectedPath);
 			var c = items.Length;
-			foreach (var (item, i) in items.Select((s, i) => (s, i))) {
+			foreach (var (item, i) in items.OrderBy(p => p, new LogicalCompare()).Select((s, i) => (s, i))) {
 				// 進行状況
-				progress.Report(new(i, c, $"{i}/{c}:{Path.GetFileName(item)}"));
+				progress.Report(new(i + 1, c, $"{i + 1}/{c}:{Path.GetFileName(item)}"));
 				// ファイル処理
-				Log.Append($"ファイル作成 {Path.GetFileName(item)}.zip");
-				ZipFile.CreateFromDirectory(item, $"{item}.zip", CompressionLevel.NoCompression, false);
+				if (!File.Exists($"{item}.zip")) {
+					Log.Append($"ファイル作成 {Path.GetFileName(item)}.zip");
+					ZipFile.CreateFromDirectory(item, $"{item}.zip", CompressionLevel.NoCompression, false);
+				}
 				// 中断
 				if (token.IsCancellationRequested) {
 					return;

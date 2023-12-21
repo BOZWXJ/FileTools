@@ -10,7 +10,8 @@
     Title="MainWindow"
     ui:WindowHelper.UseModernWindowStyle="True"
     Width="525"
-    Height="350">
+    Height="350"
+    ResizeMode="CanResizeWithGrip">
 
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -41,24 +42,18 @@
 
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
-            <ProgressBar
-                Width="100"
-                Maximum="{Binding ProgressMax.Value, Mode=OneWay}"
-                Visibility="{Binding ProgressBarVisibility.Value, Mode=OneWay}"
-                Value="{Binding Progress.Value, Mode=OneWay}" />
-            <TextBlock Text="{Binding StatusMessage.Value}" />
+            <TextBlock Text="" />
         </StatusBar>
         <Grid Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
                 <RowDefinition />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+                <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button
@@ -66,40 +61,57 @@
                 Grid.Row="0"
                 Grid.Column="0"
                 Margin="3"
+                HorizontalAlignment="Stretch"
                 Command="{Binding RenameCommand}"
                 IsEnabled="{Binding CanExecute.Value}" />
             <Button
                 Content="各サブフォルダに集める"
-                Grid.Row="1"
-                Grid.Column="0"
+                Grid.Row="0"
+                Grid.Column="1"
                 Margin="3"
+                HorizontalAlignment="Stretch"
                 Command="{Binding CollectFilesCommand}"
                 IsEnabled="{Binding CanExecute.Value}" />
             <Button
                 Content="フォルダ個別 zip 作成"
-                Grid.Row="2"
-                Grid.Column="0"
+                Grid.Row="0"
+                Grid.Column="2"
                 Margin="3"
+                HorizontalAlignment="Stretch"
                 Command="{Binding ZipCompressCommand}"
                 IsEnabled="{Binding CanExecute.Value}" />
-            <Button
-                Content="Cancel"
-                Grid.Row="3"
-                Grid.Column="0"
-                Margin="3"
-                Command="{Binding CancellCommand}"
-                IsEnabled="{Binding CanCancell.Value}" />
             <TextBox
                 x:Name="LogTextBox"
-                Grid.Row="6"
+                Grid.Row="1"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
+                Grid.ColumnSpan="3"
                 Margin="3"
                 HorizontalScrollBarVisibility="Visible"
                 IsReadOnly="True"
                 Text="{Binding LogText.Value, Mode=OneWay}"
                 TextChanged="TextBox_TextChanged"
                 VerticalScrollBarVisibility="Visible" />
+            <ProgressBar
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="3"
+                Maximum="{Binding ProgressMax.Value, Mode=OneWay}"
+                Value="{Binding Progress.Value, Mode=OneWay}" />
+            <Button
+                Content="Cancel"
+                Grid.Row="2"
+                Grid.RowSpan="2"
+                Grid.Column="2"
+                Margin="3"
+                HorizontalAlignment="Stretch"
+                Command="{Binding CancellCommand}"
+                IsEnabled="{Binding CanCancell.Value}" />
+            <TextBlock
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Text="{Binding StatusMessage.Value}" />
         </Grid>
     </DockPanel>
 </Window>

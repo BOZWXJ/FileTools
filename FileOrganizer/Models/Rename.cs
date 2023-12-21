@@ -1,4 +1,5 @@
 ﻿using FileOrganizer.Properties;
+using FileOrganizer.Utility;
 using System;
 using System.IO;
 using System.Linq;
@@ -27,9 +28,9 @@ namespace FileOrganizer.Models
 			Log.Append($"処理フォルダ {SelectedPath}");
 			var items = Directory.GetDirectories(SelectedPath).Concat(Directory.GetFiles(SelectedPath));
 			var c = items.Count();
-			foreach (var (item, i) in items.Select((s, i) => (s, i))) {
+			foreach (var (item, i) in items.OrderBy(p => p, new LogicalCompare()).Select((s, i) => (s, i))) {
 				// 進行状況
-				progress.Report(new(i, c, $"{i}/{c}:{Path.GetFileName(item)}"));
+				progress.Report(new(i + 1, c, $"{i + 1}/{c}:{Path.GetFileName(item)}"));
 				// ファイル処理
 				string name = Path.GetFileNameWithoutExtension(item);
 				string ext = Path.GetExtension(item);
