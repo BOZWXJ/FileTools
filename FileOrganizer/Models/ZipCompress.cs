@@ -41,6 +41,7 @@ namespace FileOrganizer.Models
 					return;
 				}
 			}
+			Log.Append("完了");
 		}
 	}
 }

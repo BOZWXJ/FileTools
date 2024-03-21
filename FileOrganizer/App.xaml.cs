@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Windows;
 
 namespace FileOrganizer
@@ -12,6 +13,7 @@ namespace FileOrganizer
 	{
 		private void Application_Startup(object sender, StartupEventArgs e)
 		{
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); 
 			DispatcherHelper.UIDispatcher = Dispatcher;
 			//AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 		}

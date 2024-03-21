@@ -46,45 +46,48 @@
         </StatusBar>
         <Grid Margin="3">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
                 <RowDefinition />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <Button
-                Content="ファイル名修正"
+            <StackPanel
                 Grid.Row="0"
-                Grid.Column="0"
-                Margin="3"
-                HorizontalAlignment="Stretch"
-                Command="{Binding RenameCommand}"
-                IsEnabled="{Binding CanExecute.Value}" />
-            <Button
-                Content="各サブフォルダに集める"
-                Grid.Row="0"
-                Grid.Column="1"
-                Margin="3"
-                HorizontalAlignment="Stretch"
-                Command="{Binding CollectFilesCommand}"
-                IsEnabled="{Binding CanExecute.Value}" />
-            <Button
-                Content="フォルダ個別 zip 作成"
-                Grid.Row="0"
-                Grid.Column="2"
-                Margin="3"
-                HorizontalAlignment="Stretch"
-                Command="{Binding ZipCompressCommand}"
-                IsEnabled="{Binding CanExecute.Value}" />
+                Grid.Column="0">
+                <Button
+                    Content="ファイル名修正"
+                    Margin="3"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding RenameCommand}"
+                    IsEnabled="{Binding CanExecute.Value}" />
+                <Button
+                    Content="各サブフォルダに集める"
+                    Margin="3"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding CollectFilesCommand}"
+                    IsEnabled="{Binding CanExecute.Value}" />
+                <Button
+                    Content="フォルダ個別 zip 作成"
+                    Margin="3"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding ZipCompressCommand}"
+                    IsEnabled="{Binding CanExecute.Value}" />
+                <Button
+                    Content="webp 変換"
+                    Margin="3"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding WebpConvertCommand}"
+                    IsEnabled="{Binding CanExecute.Value}" />
+            </StackPanel>
             <TextBox
                 x:Name="LogTextBox"
-                Grid.Row="1"
-                Grid.Column="0"
-                Grid.ColumnSpan="3"
+                Grid.Row="0"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
                 Margin="3"
                 HorizontalScrollBarVisibility="Visible"
                 IsReadOnly="True"
@@ -92,7 +95,7 @@
                 TextChanged="TextBox_TextChanged"
                 VerticalScrollBarVisibility="Visible" />
             <ProgressBar
-                Grid.Row="2"
+                Grid.Row="1"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="3"
@@ -100,7 +103,7 @@
                 Value="{Binding Progress.Value, Mode=OneWay}" />
             <Button
                 Content="Cancel"
-                Grid.Row="2"
+                Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="2"
                 Margin="3"
@@ -108,7 +111,7 @@
                 Command="{Binding CancellCommand}"
                 IsEnabled="{Binding CanCancell.Value}" />
             <TextBlock
-                Grid.Row="3"
+                Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Text="{Binding StatusMessage.Value}" />

@@ -10,9 +10,11 @@ namespace FileOrganizer.Models
 {
 	internal class CollectFiles
 	{
-		public static string SelectedPath {
+		public static string SelectedPath
+		{
 			get => Settings.Default.CollectFilesPath;
-			private set {
+			private set
+			{
 				Settings.Default.CollectFilesPath = value;
 				Settings.Default.Save();
 			}
@@ -57,11 +59,11 @@ namespace FileOrganizer.Models
 							|| name.EndsWith(".url", StringComparison.OrdinalIgnoreCase)) {
 							// 不要	hentaicore.jpg, hc.jpg, Thumbs.db, .DS_Store, *.txt, *.url
 							Log.Append($"ファイル削除 {file}");
-							// next: File.Delete(file);
+							File.Delete(file);
 						} else if (!file.Equals(dest, StringComparison.OrdinalIgnoreCase) && !File.Exists(dest)) {
 							// 移動	その他
 							Log.Append($"ファイル移動 {dest}");
-							// next: File.Move(file, dest);
+							File.Move(file, dest);
 						}
 					}
 					// 中断
@@ -72,13 +74,14 @@ namespace FileOrganizer.Models
 				// サブフォルダ削除
 				foreach (string dir in Directory.GetDirectories(item)) {
 					Log.Append($"サブフォルダ削除 {dir}");
-					// next: Directory.Delete(dir, true);
+					Directory.Delete(dir, true);
 				}
 				// 中断
 				if (token.IsCancellationRequested) {
 					return;
 				}
 			}
+			Log.Append("完了");
 		}
 	}
 }

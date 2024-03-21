@@ -46,7 +46,7 @@ namespace FileOrganizer.Models
 					string dest = Path.Combine(SelectedPath, newName + ext);
 					if (!Directory.Exists(dest) && !File.Exists(dest)) {
 						Log.Append($"名前変更 {name} -> {newName}");
-						// next: Directory.Move(item, dest);
+						Directory.Move(item, dest);
 					}
 				}
 				// 中断
@@ -54,6 +54,7 @@ namespace FileOrganizer.Models
 					return;
 				}
 			}
+			Log.Append("完了");
 		}
 		#region
 		private static string CheckName(string name)

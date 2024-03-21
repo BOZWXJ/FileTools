@@ -58,5 +58,17 @@ namespace FileOrganizer.Properties {
                 this["ZipCompressPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string WebpConvertPath {
+            get {
+                return ((string)(this["WebpConvertPath"]));
+            }
+            set {
+                this["WebpConvertPath"] = value;
+            }
+        }
     }
 }

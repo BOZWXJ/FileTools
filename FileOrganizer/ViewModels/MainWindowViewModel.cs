@@ -1,22 +1,14 @@
 ﻿using FileOrganizer.Models;
 using Livet;
-using Livet.Commands;
-using Livet.EventListeners;
-using Livet.Messaging;
 using Livet.Messaging.IO;
-using Livet.Messaging.Windows;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 
 namespace FileOrganizer.ViewModels
 {
@@ -29,6 +21,7 @@ namespace FileOrganizer.ViewModels
 		public AsyncReactiveCommand RenameCommand { get; }
 		public AsyncReactiveCommand CollectFilesCommand { get; }
 		public AsyncReactiveCommand ZipCompressCommand { get; }
+		public AsyncReactiveCommand WebpConvertCommand { get; }
 
 		// Cancel
 		public ReadOnlyReactivePropertySlim<bool> CanCancell { get; }
@@ -80,6 +73,16 @@ namespace FileOrganizer.ViewModels
 				if (msg.Response != null) {
 					cts = new();
 					await Task.Run(() => ZipCompress.Method(msg.Response.First(), _Progress, cts.Token));
+				}
+			});
+			WebpConvertCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
+				StatusMessage.Value = string.Empty;
+				Progress.Value = 0;
+				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = ZipCompress.SelectedPath };
+				Messenger.Raise(msg);
+				if (msg.Response != null) {
+					cts = new();
+					await Task.Run(() => WebpConvert.Method(msg.Response.First(), _Progress, cts.Token));
 				}
 			});
 
