@@ -10,48 +10,61 @@ namespace FileOrganizer.Models
 {
 	internal static class Rename
 	{
-		public static string SelectedPath {
+		public static string SelectedPath
+		{
 			get => Settings.Default.RenamePath;
-			private set {
+			private set
+			{
 				Settings.Default.RenamePath = value;
 				Settings.Default.Save();
 			}
 		}
 
-		public static void Method(string path, IProgress<ProgressInfo> progress, CancellationToken token)
+		public static void Method(string[] path, IProgress<ProgressInfo> progress, CancellationToken token)
 		{
-			if (!Directory.Exists(path)) {
+			if (path == null || !path.Any(Directory.Exists)) {
 				Log.Append("フォルダを選択して下さい");
 				return;
 			}
-			SelectedPath = path;
-			Log.Append($"処理フォルダ {SelectedPath}");
-			var items = Directory.GetDirectories(SelectedPath).Concat(Directory.GetFiles(SelectedPath));
-			var c = items.Count();
-			foreach (var (item, i) in items.OrderBy(p => p, new LogicalCompare()).Select((s, i) => (s, i))) {
-				// 進行状況
-				progress.Report(new(i + 1, c, $"{i + 1}/{c}:{Path.GetFileName(item)}"));
-				// ファイル処理
-				string name = Path.GetFileNameWithoutExtension(item);
-				string ext = Path.GetExtension(item);
-				string newName;
-				if (ext.Equals(".opdownload", StringComparison.OrdinalIgnoreCase)) {
-					continue;
-				} else if (ext.Equals(".pdf", StringComparison.OrdinalIgnoreCase)) {
-					newName = PdfName(name);
-				} else {
-					newName = CheckName(name);
-				}
-				if (!name.Equals(newName, StringComparison.OrdinalIgnoreCase)) {
-					string dest = Path.Combine(SelectedPath, newName + ext);
-					if (!Directory.Exists(dest) && !File.Exists(dest)) {
-						Log.Append($"名前変更 {name} -> {newName}");
-						Directory.Move(item, dest);
+			if (path.Length == 1) {
+				SelectedPath = path[0];
+			} else {
+				SelectedPath = Path.GetDirectoryName(path[0]);
+			}
+			int max = 0, cnt = 0;
+			foreach (var item in path) {
+				max += Directory.GetDirectories(item).Length;
+				max += Directory.GetFiles(item).Length;
+			}
+			foreach (var folder in path) {
+				Log.Append($"処理フォルダ {folder}");
+				var items = Directory.GetDirectories(folder).Concat(Directory.GetFiles(folder));
+				foreach (var item in items.OrderBy(p => p, new LogicalCompare())) {
+					// 進行状況
+					cnt++;
+					progress.Report(new(cnt, max, $"{cnt}/{max}:{Path.GetFileName(item)}"));
+					// ファイル処理
+					string name = Path.GetFileNameWithoutExtension(item);
+					string ext = Path.GetExtension(item);
+					string newName;
+					if (ext.Equals(".opdownload", StringComparison.OrdinalIgnoreCase)) {
+						continue;
+					} else if (ext.Equals(".pdf", StringComparison.OrdinalIgnoreCase)) {
+						newName = PdfName(name);
+					} else {
+						newName = CheckName(name);
 					}
-				}
-				// 中断
-				if (token.IsCancellationRequested) {
-					return;
+					if (!name.Equals(newName, StringComparison.OrdinalIgnoreCase)) {
+						string dest = Path.Combine(folder, newName + ext);
+						if (!Directory.Exists(dest) && !File.Exists(dest)) {
+							Log.Append($"名前変更 {name} -> {newName}");
+							// Directory.Move(item, dest);
+						}
+					}
+					// 中断
+					if (token.IsCancellationRequested) {
+						return;
+					}
 				}
 			}
 			Log.Append("完了");

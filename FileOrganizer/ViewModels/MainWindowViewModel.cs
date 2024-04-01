@@ -46,11 +46,11 @@ namespace FileOrganizer.ViewModels
 			RenameCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
 				StatusMessage.Value = string.Empty;
 				Progress.Value = 0;
-				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = Rename.SelectedPath };
+				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = Rename.SelectedPath, Multiselect = true };
 				Messenger.Raise(msg);
 				if (msg.Response != null) {
 					cts = new();
-					await Task.Run(() => Rename.Method(msg.Response.First(), _Progress, cts.Token));
+					await Task.Run(() => Rename.Method(msg.Response, _Progress, cts.Token));
 				}
 			});
 			// 各サブフォルダに集める
@@ -68,21 +68,21 @@ namespace FileOrganizer.ViewModels
 			ZipCompressCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
 				StatusMessage.Value = string.Empty;
 				Progress.Value = 0;
-				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = ZipCompress.SelectedPath };
+				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = ZipCompress.SelectedPath, Multiselect = true };
 				Messenger.Raise(msg);
 				if (msg.Response != null) {
 					cts = new();
-					await Task.Run(() => ZipCompress.Method(msg.Response.First(), _Progress, cts.Token));
+					await Task.Run(() => ZipCompress.Method(msg.Response, _Progress, cts.Token));
 				}
 			});
 			WebpConvertCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
 				StatusMessage.Value = string.Empty;
 				Progress.Value = 0;
-				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = ZipCompress.SelectedPath };
+				FolderSelectionMessage msg = new() { MessageKey = "FolderSelect", Title = "処理フォルダの選択", SelectedPath = ZipCompress.SelectedPath, Multiselect = true };
 				Messenger.Raise(msg);
 				if (msg.Response != null) {
 					cts = new();
-					await Task.Run(() => WebpConvert.Method(msg.Response.First(), _Progress, cts.Token));
+					await Task.Run(() => WebpConvert.Method(msg.Response, _Progress, cts.Token));
 				}
 			});
 
