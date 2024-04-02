@@ -58,7 +58,7 @@ namespace FileOrganizer.Models
 						string dest = Path.Combine(folder, newName + ext);
 						if (!Directory.Exists(dest) && !File.Exists(dest)) {
 							Log.Append($"名前変更 {name} -> {newName}");
-							// Directory.Move(item, dest);
+							Directory.Move(item, dest);
 						}
 					}
 					// 中断

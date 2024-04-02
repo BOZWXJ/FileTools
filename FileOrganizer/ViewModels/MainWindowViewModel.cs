@@ -75,6 +75,7 @@ namespace FileOrganizer.ViewModels
 					await Task.Run(() => ZipCompress.Method(msg.Response, _Progress, cts.Token));
 				}
 			});
+			// webp 変換
 			WebpConvertCommand = CanExecute.ToAsyncReactiveCommand().WithSubscribe(async () => {
 				StatusMessage.Value = string.Empty;
 				Progress.Value = 0;
